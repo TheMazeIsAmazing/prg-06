@@ -34,6 +34,7 @@ router.use(express.urlencoded({
 //     }
 // ]
 
+
 //index
 router.get("/people", async (req, res) => {
     console.log('get');
