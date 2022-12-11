@@ -25,7 +25,7 @@ require('dotenv').config();
 
 //Import people router
 const routerPeople = require("./epic_routes/routes_people");
-app.use('/', routerPeople);
+app.use('/people', routerPeople);
 
 app.listen(8000, () => {
     console.log("Yay, your Server is Runnign");

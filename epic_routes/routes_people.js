@@ -1,9 +1,6 @@
-// const users = require("../data.json");
-
+//Require stuff
 const express = require("express");
-
 const router = express.Router();
-
 const People = require("../epic_models/model_people");
 
 //allow x-www-form-urlencoded stuff
@@ -11,47 +8,45 @@ router.use(express.urlencoded({
     extended: true
 }))
 
-// let data = [
+// let exampleData = [
 //     {
-//         "id": 1,
+//         "id": 63933dad203d78b58c4d579d,
 //         "name": "Mees",
 //         "age": 18
-//     },
-//     {
-//         "id": 2,
-//         "name": "Diego",
-//         "age": 23
-//     },
-//     {
-//         "id": 3,
-//         "name": "Ole",
-//         "age": 22
-//     },
-//     {
-//         "id": 4,
-//         "name": "Daan",
-//         "age": 19
 //     }
 // ]
 
-
 //index
-router.get("/people", async (req, res) => {
+router.get("/", async (req, res) => {
     console.log('get');
 
     try {
         let people = await People.find();
-        res.json(people);
+
+        let peopleCollection = {
+            items: people,
+
+            _links: {
+                self: {
+                    href: `${process.env.BASE_URI}people/`
+                },
+                collection: {
+                    href: `${process.env.BASE_URI}people/`
+                }
+            },
+
+            pagination: ""
+
+        }
+
+        res.json(peopleCollection);
     } catch {
         res.status(500).send();
     }
 });
 
-//show
-router.get("/people/:id", async (req, res) => {
-    // console.log('get');
-    // res.json(`Requesting thing with id: ${req.params.id}`);
-
+//show specific person
+router.get("/:id", async (req, res) => {
     try {
         let people = await People.findById(req.params.id);
         res.json(people);
@@ -60,30 +55,30 @@ router.get("/people/:id", async (req, res) => {
     }
 });
 
-//create
-router.get("/people/create", async (req, res) => {
-    console.log('get');
+//TODO: create form
+router.get("/create", (req, res) => {
 
-    res.send('create form');
+    res.send('TODO: create form');
 
-    // try {
-    //     let people = await People.find();
-    //     res.json(people);
-    // } catch {
-    //     res.status(500).send();
-    // }
 });
 
-//post
-router.post("/people/store", async (req, res) => {
-    // console.log('post');
-    console.log(`Logging req.body ${req.body}`)
-    // let person = new People({
-    //     name: req.query.name,
-    //     age: req.query.age
-    // })
+//Before storing new Person, check content type
+router.post("/store", (req, res, next) => {
+    // if (req.header('Content-Type') !== 'application/json') {
+    //     res.status(415).send();
+    // } else {
+    //     next();
+    // }
+    //Somewhere I saw it needed to be x-www-form-urlencoded, so idk what's right
+    if (req.header('Content-Type') !== 'application/x-www-form-urlencoded') {
+        res.status(415).send();
+    } else {
+        next();
+    }
+});
 
-    //voorbeeld code Bas
+//Store new Person
+router.post("/store", async (req, res) => {
     let person = new People({
         name: req.body.name,
         age: req.body.age
@@ -91,14 +86,14 @@ router.post("/people/store", async (req, res) => {
 
     try {
         await person.save();
-        res.send();
+        res.status(201).send();
     } catch {
         res.status(500).send();
     }
 });
 
 //remove
-router.delete("/people/:id/delete", async (req, res) => {
+router.delete("/:id/delete", async (req, res) => {
     // console.log('Delete');
     // res.json(`Requesting thing with id: ${req.params.id}`);
 
@@ -111,11 +106,34 @@ router.delete("/people/:id/delete", async (req, res) => {
     }
 });
 
-//options
-router.options("/people", (req, res) => {
+//TODO: change form
+router.get("/:id/change", async (req, res) => {
+    console.log('change');
+    res.json(`Changing thing with id: ${req.params.id}`);
+
+});
+
+//Update a person
+router.put('/:id/update', async (req, res) => {
+    console.log('PUT');
+    try {
+        await People.findByIdAndUpdate(req.params.id, {
+            name: req.body.name,
+            age: req.body.age
+        })
+        res.status(200).send();
+    } catch {
+        res.status(500).send();
+    }
+
+});
+
+//TODO: IDK what to do here...
+router.options("/", (req, res) => {
     console.log('options');
     // res.send('options data');
     res.send.allow('GET, POST, OPTIONS, PUT');
 });
 
+//Export the router
 module.exports = router;
