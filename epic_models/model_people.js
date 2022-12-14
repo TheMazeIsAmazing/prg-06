@@ -9,14 +9,15 @@ const Schema = mongoose.Schema;
 //         "id": 63933dad203d78b58c4d579d,
 //         "firstName": "Mees",
 //         "lastName": "Muller",
-//         "age": 18
+//         "age": "18"
 //     }
 // ]
 
 const PeopleSchema = new Schema({
         firstName: String,
         lastName: String,
-        age: Number
+        age: String
+        // age: Number
     },
     {
         toJSON: {
@@ -32,6 +33,23 @@ PeopleSchema.virtual('_links').get(
             },
             collection: {
                 href: `${process.env.BASE_URI}people/`
+
+            },
+            pagination: {
+                "currentPage": 1,
+                "currentItems": 6,
+                "totalPages": 1,
+                "totalItems": 6,
+                "_links": {
+                    "first": {
+                        "page": 1,
+                        "href": `${process.env.BASE_URI}people/?start=1&limit=10`
+                    },
+
+                    "last": {},
+                    "previous": {},
+                    "next": {}
+                }
             }
         }
     }

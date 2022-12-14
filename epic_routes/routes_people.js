@@ -2,6 +2,8 @@
 const express = require("express");
 const router = express.Router();
 const People = require("../epic_models/model_people");
+
+//body parser stuff
 const bodyParser = require("body-parser");
 router.use(bodyParser.urlencoded({extended: true}));
 router.use(bodyParser.json({type: 'application/json'}));
@@ -12,9 +14,18 @@ router.use(bodyParser.json({type: 'application/json'}));
 //         "id": 63933dad203d78b58c4d579d,
 //         "firstName": "Mees",
 //         "lastName": "Muller",
-//         "age": 18
+//         "age": "18"
 //     }
 // ]
+
+router.use(function(req, res, next){
+    // respond with json
+    if (req.accepts('json')) {
+        next();
+    } else {
+        res.status(400).send();
+    }
+});
 
 //index
 router.get("/", async (req, res) => {
@@ -63,22 +74,17 @@ router.get("/create", (req, res) => {
 });
 
 //Before storing new Person, check content type
-router.post("/store", (req, res, next) => {
-    if (req.header('Content-Type') !== 'application/json') {
+router.post("/", (req, res, next) => {
+    //Check if request is either form data or json
+    if (req.header('Content-Type') !== 'application/x-www-form-urlencoded' && req.header('Content-Type') !== 'application/json') {
         res.status(415).send();
     } else {
         next();
     }
-    //Somewhere I saw it needed to be x-www-form-urlencoded, so idk what's right
-    // if (req.header('Content-Type') !== 'application/x-www-form-urlencoded') {
-    //     res.status(415).send();
-    // } else {
-    //     next();
-    // }
 });
 
 //Before storing new Person, check if no empty values
-router.post("/store", (req, res, next) => {
+router.post("/", (req, res, next) => {
     if (req.body.firstName && req.body.lastName && req.body.age) {
         next();
     } else {
@@ -87,7 +93,7 @@ router.post("/store", (req, res, next) => {
 });
 
 //Store new Person
-router.post("/store", async (req, res) => {
+router.post("/", async (req, res) => {
     let person = new People({
         firstName: req.body.firstName,
         lastName: req.body.lastName,
@@ -103,7 +109,7 @@ router.post("/store", async (req, res) => {
 });
 
 //remove
-router.delete("/:id/delete", async (req, res) => {
+router.delete("/:id/", async (req, res) => {
     try {
         await People.findByIdAndDelete(req.params.id);
         res.status(200).send();
@@ -120,7 +126,7 @@ router.get("/:id/change", async (req, res) => {
 });
 
 //Update a person
-router.put('/:id/update', async (req, res) => {
+router.put('/:id/', async (req, res) => {
     console.log('PUT');
     try {
         await People.findByIdAndUpdate(req.params.id, {
