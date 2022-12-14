@@ -7,20 +7,22 @@ const Schema = mongoose.Schema;
 // let exampleData = [
 //     {
 //         "id": 63933dad203d78b58c4d579d,
-//         "name": "Mees",
+//         "firstName": "Mees",
+//         "lastName": "Muller",
 //         "age": 18
 //     }
 // ]
 
 const PeopleSchema = new Schema({
-    name: String,
-    age: Number,
-},
-{
-    toJSON: {
-        virtuals: true
-    }
-});
+        firstName: String,
+        lastName: String,
+        age: Number
+    },
+    {
+        toJSON: {
+            virtuals: true
+        }
+    });
 
 PeopleSchema.virtual('_links').get(
     function () {
@@ -28,9 +30,6 @@ PeopleSchema.virtual('_links').get(
             self: {
                 href: `${process.env.BASE_URI}people/${this._id}`
             },
-            // edit: {
-            //     href: `${process.env.BASE_URI}people/${this._id}`
-            // },
             collection: {
                 href: `${process.env.BASE_URI}people/`
             }

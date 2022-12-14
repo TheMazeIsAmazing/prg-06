@@ -1,6 +1,7 @@
 console.log("hello WERELD")
 
 const express = require("express");
+const bodyParser = require("body-parser");
 
 const app = express();
 
@@ -27,6 +28,12 @@ require('dotenv').config();
 const routerPeople = require("./epic_routes/routes_people");
 app.use('/people', routerPeople);
 
+//app use stuff
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json({type: 'application/json'}));
+
+
+//listen to specific port
 app.listen(8000, () => {
     console.log("Yay, your Server is Runnign");
 });
