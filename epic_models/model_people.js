@@ -34,22 +34,6 @@ PeopleSchema.virtual('_links').get(
             collection: {
                 href: `${process.env.BASE_URI}people/`
 
-            },
-            pagination: {
-                "currentPage": 1,
-                "currentItems": 6,
-                "totalPages": 1,
-                "totalItems": 6,
-                "_links": {
-                    "first": {
-                        "page": 1,
-                        "href": `${process.env.BASE_URI}people/?start=1&limit=10`
-                    },
-
-                    "last": {},
-                    "previous": {},
-                    "next": {}
-                }
             }
         }
     }

@@ -8,6 +8,13 @@ const bodyParser = require("body-parser");
 router.use(bodyParser.urlencoded({extended: true}));
 router.use(bodyParser.json({type: 'application/json'}));
 
+//cors stuff
+router.all('*', function (req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'application/json');
+    next();
+});
 
 // let exampleData = [
 //     {
@@ -18,7 +25,7 @@ router.use(bodyParser.json({type: 'application/json'}));
 //     }
 // ]
 
-router.use(function(req, res, next){
+router.use(function (req, res, next) {
     // respond with json
     if (req.accepts('json')) {
         next();
@@ -29,10 +36,33 @@ router.use(function(req, res, next){
 
 //index
 router.get("/", async (req, res) => {
-    console.log('get');
+    let limit = null
+    let start = 1
+    if(req.query.limit !== undefined) {
+        limit = parseInt(req.query.limit);
+    }
+    if(req.query.start !== undefined) {
+        start = parseInt(req.query.start);
+    }
 
-    try {
-        let people = await People.find();
+    let totalItems = await People.find().count();
+
+    if (limit === null) {
+        limit = totalItems
+    }
+
+    let people = await People.find()
+        .limit(limit)
+        .skip((start - 1) * limit)
+        .exec();
+
+    // let totalItems = allPeople;
+    let totalPages = Math.ceil((totalItems / limit));
+    console.log(`limit: ${limit}, start: ${start}, totalPages: ${totalPages}, totalItems: ${totalItems}`);
+
+    if (people.length < 1) {
+        res.status(500).send();
+    } else {
 
         let peopleCollection = {
             items: people,
@@ -46,13 +76,35 @@ router.get("/", async (req, res) => {
                 }
             },
 
-            pagination: ""
+            pagination: {
+                "currentPage": start,
+                "currentItems": limit,
+                "totalPages": totalPages,
+                "totalItems": totalItems,
+                "_links": {
+                    "first": {
+                        "page": 1,
+                        "href": `${process.env.BASE_URI}people/?start=1&limit=${limit}`
+                    },
+
+                    "last": {
+                        "page": totalPages,
+                        "href": `${process.env.BASE_URI}people/?start=${totalPages}&limit=${limit}`
+                    },
+                    "previous": {
+                        "page": start - 1,
+                        "href": `${process.env.BASE_URI}people/?start=${start - 1}&limit=${limit}`
+                    },
+                    "next": {
+                        "page": start + 1,
+                        "href": `${process.env.BASE_URI}people/?start=${start + 1}&limit=${limit}`
+                    }
+                }
+            }
 
         }
 
         res.json(peopleCollection);
-    } catch {
-        res.status(500).send();
     }
 });
 
@@ -60,7 +112,11 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
     try {
         let people = await People.findById(req.params.id);
-        res.json(people);
+        if (people !== null) {
+            res.json(people);
+        } else {
+            res.status(404).send();
+        }
     } catch {
         res.status(404).send();
     }
@@ -112,7 +168,7 @@ router.post("/", async (req, res) => {
 router.delete("/:id/", async (req, res) => {
     try {
         await People.findByIdAndDelete(req.params.id);
-        res.status(200).send();
+        res.status(204).send();
     } catch {
         res.status(404).send();
     }
@@ -125,9 +181,28 @@ router.get("/:id/change", async (req, res) => {
 
 });
 
+//Before updating existing Person, check content type
+router.put("/:id/", (req, res, next) => {
+    //Check if request is either form data or json
+    if (req.header('Content-Type') !== 'application/x-www-form-urlencoded' && req.header('Content-Type') !== 'application/json') {
+        res.status(415).send();
+    } else {
+        next();
+    }
+});
+
+//Before updating existing Person, check if no empty values
+router.put("/:id/", (req, res, next) => {
+    console.log(req.body.firstName, req.body.lastName, req.body.age);
+    if (req.body.firstName && req.body.lastName && req.body.age) {
+        next();
+    } else {
+        res.status(400).send();
+    }
+});
+
 //Update a person
 router.put('/:id/', async (req, res) => {
-    console.log('PUT');
     try {
         await People.findByIdAndUpdate(req.params.id, {
             firstName: req.body.firstName,
@@ -144,6 +219,11 @@ router.put('/:id/', async (req, res) => {
 //options
 router.options("/", (req, res) => {
     res.setHeader("Allow", 'GET, POST, OPTIONS');
+    res.send();
+});
+
+router.options("/:id", (req, res) => {
+    res.setHeader("Allow", 'GET, OPTIONS, PUT, DELETE');
     res.send();
 });
 
