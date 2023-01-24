@@ -29,3 +29,12 @@ thead {
 .back-button {
     background-color: blue;
 }
+
+.epic-form label::after {
+    content: "\A \A";
+    white-space: pre;
+}
+
+.epic-form label input {
+    margin-left: 20px;
+}

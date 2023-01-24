@@ -1,19 +1,32 @@
 import "./style.css";
 
-import { useState } from 'react';
+import React, {useState, useEffect} from 'react';
 
 export function APIDetails(props) {
     const [people, setPeople] = useState(null)
+    const [isFetching, setIsFetching] = useState(true);
 
     fetch('http://145.24.222.202:8000/people/' + props.id)
         .then(response => response.json())
-        .then(data => setPeople(data))
-        .catch(error => console.error(error))
+        .then(data => {
+            setPeople(data);
+            setIsFetching(false);
+        })
+        .catch(error => {
+            console.error(error);
+            setIsFetching(false);
+        });
 
-    let listItems = []
+    useEffect(() => {
+        if (!isFetching && people === null) {
+            document.window = "/";
+        }
+    }, [people, isFetching]);
+
+    let tableItems = []
 
     if (people !== null) {
-        listItems.push(
+        tableItems.push(
             <tr key={people._id}>
                 <td>{people.firstName}</td>
                 <td>{people.lastName}</td>
@@ -21,13 +34,13 @@ export function APIDetails(props) {
             </tr>
         );
     } else {
-        listItems.push(
-            <tr>
+        tableItems.push(
+            <tr key={22}>
                 <td colSpan={3}>Laden...</td>
             </tr>
         );
-        listItems.push(
-            <tr>
+        tableItems.push(
+            <tr key={23}>
                 <td colSpan={3}>Zie je dit te lang? Kijk in de console voor de fout.</td>
             </tr>
         );
@@ -35,15 +48,25 @@ export function APIDetails(props) {
     return (
         <table>
             <thead>
-            <tr>
-                <th>Voornaam</th>
-                <th>Achternaam</th>
-                <th>Leeftijd</th>
-            </tr>
+            <Columns/>
             </thead>
             <tbody>
-            {listItems}
+            {tableItems}
             </tbody>
         </table>
     )
+}
+
+class Columns extends React.Component {
+    render() {
+        return (
+            <>
+                <tr>
+                    <th>Voornaam</th>
+                    <th>Achternaam</th>
+                    <th>Leeftijd</th>
+                </tr>
+            </>
+        );
+    }
 }

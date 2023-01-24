@@ -1,6 +1,6 @@
 import "./style.css";
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 export function APIPull() {
     const [people, setPeople] = useState(null)
@@ -26,6 +26,19 @@ export function APIPull() {
     return (
         <table>
             <thead>
+            <Columns/>
+            </thead>
+            <tbody>
+                {listItems}
+            </tbody>
+        </table>
+    )
+}
+
+class Columns extends React.Component {
+    render() {
+        return (
+            <>
                 <tr>
                     <th>#</th>
                     <th>Voornaam</th>
@@ -33,10 +46,7 @@ export function APIPull() {
                     <th>Leeftijd</th>
                     <th>Details</th>
                 </tr>
-            </thead>
-            <tbody>
-                {listItems}
-            </tbody>
-        </table>
-    )
+            </>
+        );
+    }
 }

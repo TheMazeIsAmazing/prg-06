@@ -7,6 +7,7 @@ export async function deleteThing(props) {
         await fetch('http://145.24.222.202:8000/people/' + props.target.id, {
             method: "DELETE",
         });
+        document.window = "/";
     } catch (error) {
         console.log(error);
     }
