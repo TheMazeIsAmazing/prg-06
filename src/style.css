@@ -1,0 +1,9 @@
+* {
+    font-family: "Comic Sans MS";
+}
+
+thead {
+    text-align: left;
+    color: #fff;
+    background-color: #282323;
+}
