@@ -8,14 +8,6 @@ const bodyParser = require("body-parser");
 router.use(bodyParser.urlencoded({extended: true}));
 router.use(bodyParser.json({type: 'application/json'}));
 
-//cors stuff
-router.all('*', function (req, res, next) {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'application/json');
-    next();
-});
-
 // let exampleData = [
 //     {
 //         "id": 63933dad203d78b58c4d579d,
@@ -122,13 +114,6 @@ router.get("/:id", async (req, res) => {
     }
 });
 
-//TODO: create form
-router.get("/create", (req, res) => {
-
-    res.send('TODO: create form');
-
-});
-
 //Before storing new Person, check content type
 router.post("/", (req, res, next) => {
     //Check if request is either form data or json
@@ -174,13 +159,6 @@ router.delete("/:id/", async (req, res) => {
     }
 });
 
-//TODO: change form
-router.get("/:id/change", async (req, res) => {
-    console.log('change');
-    res.json(`Changing thing with id: ${req.params.id}`);
-
-});
-
 //Before updating existing Person, check content type
 router.put("/:id/", (req, res, next) => {
     //Check if request is either form data or json
@@ -217,13 +195,19 @@ router.put('/:id/', async (req, res) => {
 });
 
 //options
-router.options("/", (req, res) => {
-    res.setHeader("Allow", 'GET, POST, OPTIONS');
+router.options((req, res) => {
+    res.header("Access-Control-Allow-Methods", "HEAD, GET, POST, OPTIONS");
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Accept, Access-Control-Allow-Origin");
+    res.header("Allow", "HEAD, GET, POST, OPTIONS");
     res.send();
-});
+})
 
 router.options("/:id", (req, res) => {
-    res.setHeader("Allow", 'GET, OPTIONS, PUT, DELETE');
+    res.header("Access-Control-Allow-Methods", "HEAD, GET, PUT, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Accept, Access-Control-Allow-Origin");
+    res.header("Allow", "HEAD, GET, PUT, DELETE, OPTIONS");
     res.send();
 });
 

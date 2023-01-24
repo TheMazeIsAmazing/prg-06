@@ -7,3 +7,25 @@ thead {
     color: #fff;
     background-color: #282323;
 }
+
+.delete-button, .back-button {
+    text-decoration: none;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-right: 20px;
+    border: none;
+}
+
+.delete-button:hover, .back-button:hover {
+    cursor: pointer;
+}
+
+.delete-button {
+    background-color: red;
+}
+
+.back-button {
+    background-color: blue;
+}

@@ -18,7 +18,8 @@ export function APIDetails(props) {
                 <td>{people.firstName}</td>
                 <td>{people.lastName}</td>
                 <td>{people.age}</td>
-            </tr>);
+            </tr>
+        );
     } else {
         listItems.push(
             <tr>
